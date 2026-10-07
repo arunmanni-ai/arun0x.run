@@ -1,0 +1,11 @@
+{
+  "slug": "first-note",
+  "title": "A note from the workbench",
+  "description": "Replace this with the observation you want to share.",
+  "date": "2026-10-07",
+  "status": "draft",
+  "tags": [],
+  "blocks": [
+    { "type": "paragraph", "text": "Write a useful observation, the context that makes it understandable, and any remaining uncertainty. This draft is never published until its status is changed." }
+  ]
+}

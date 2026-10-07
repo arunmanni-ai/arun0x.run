@@ -1,0 +1,21 @@
+{
+  "slug": "first-investigation",
+  "title": "The first investigation",
+  "description": "Replace this with a concise description of your research.",
+  "date": "2026-10-07",
+  "status": "draft",
+  "tags": ["kernel", "reverse engineering"],
+  "blocks": [
+    { "type": "heading", "id": "overview", "text": "Overview" },
+    { "type": "paragraph", "text": "Describe the question, the scope of the investigation, and the finding. This draft is never included in the published site." },
+    { "type": "heading", "id": "environment", "text": "Environment" },
+    { "type": "list", "items": ["Target and exact version", "Operating system and tool versions", "Controlled test environment"] },
+    { "type": "heading", "id": "investigation", "text": "Investigation" },
+    { "type": "paragraph", "text": "Record what you observed, the steps to reproduce it, and the evidence supporting the result." },
+    { "type": "code", "language": "text", "text": "Replace this block with your code or observed output.\nHTML and script tags inside code are displayed as text." },
+    { "type": "heading", "id": "limitations", "text": "Limitations and open questions" },
+    { "type": "paragraph", "text": "Separate confirmed findings from hypotheses. Explain what remains unknown." },
+    { "type": "heading", "id": "references", "text": "References" },
+    { "type": "paragraph", "text": "Add source links using link blocks. External links must use HTTPS." }
+  ]
+}

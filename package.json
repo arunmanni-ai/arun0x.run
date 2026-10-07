@@ -1,0 +1,13 @@
+{
+  "name": "arun0x-run",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Arun's independent security research archive. A dependency-free static site.",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test scripts/security.test.mjs",
+    "preview": "node scripts/serve.mjs"
+  },
+  "engines": { "node": ">=20" }
+}
