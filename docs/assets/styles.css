@@ -36,7 +36,7 @@ button { color: inherit; }
 .visual-view { position: absolute; inset: 0; z-index: -1; }
 .archive-art { position: absolute; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; }
 .visual-view::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, #060707 0%, transparent 14%, transparent 83%, rgb(0 0 0 / .2) 100%); pointer-events: none; }
-.investigation { position: absolute; z-index: 2; top: 34.5%; left: 54.2%; width: 17.7%; max-width: 340px; line-height: 1.45; }
+.investigation { position: absolute; z-index: 2; top: 34.5%; left: 54.2%; width: clamp(230px, 17.7vw, 340px); max-width: 340px; line-height: 1.45; }
 .eyebrow { color: var(--muted); font-size: .75rem; text-transform: uppercase; letter-spacing: .14em; margin: 0 0 5px; }
 .investigation h2 { font-size: 1rem; font-weight: 400; margin: 0 0 4px; line-height: 1.4; }
 .investigation p:not(.eyebrow) { color: var(--muted); font-size: .8125rem; line-height: 1.35; margin: 0 0 15px; letter-spacing: .02em; }
@@ -117,7 +117,7 @@ pre { margin: 0; overflow: auto; padding: 20px; line-height: 1.7; font-size: .87
 code { font-family: var(--mono); }
 .back-link { margin-bottom: 30px; display: inline-flex; gap: 10px; color: var(--muted); font-size: .875rem; }
 @media (min-aspect-ratio: 17/10) and (min-width: 901px) { .archive-art { object-fit: fill; } .investigation { top: 35.5%; } }
-@media (max-width: 1100px) and (min-width: 901px) { .investigation { width: 23%; left: 52%; } .hotspot-notes { right: 5%; } .investigation p:not(.eyebrow) { font-size: .75rem; } }
+@media (max-width: 1100px) and (min-width: 901px) { .investigation { width: clamp(220px, 23vw, 280px); left: 52%; } .hotspot-notes { right: 5%; } .investigation p:not(.eyebrow) { font-size: .75rem; } }
 @media (max-width: 900px) {
   .site-header { margin: 0 24px; padding: 14px 0; min-height: 64px; }
   .home-shell { min-height: 100svh; display: flex; flex-direction: column; overflow: hidden; }
