@@ -67,7 +67,7 @@ test('complete build excludes drafts and resolves local links and assets', async
     assert.ok(text.includes('Skip to content'));
     assert.ok(!/<script(?![^>]*src=)/.test(text));
     for (const match of text.matchAll(/(?:href|src)="(\/[^"#]*)"/g)) {
-      const relative = decodeURIComponent(match[1]);
+      const relative = decodeURIComponent(new URL(match[1], 'https://arun0x.run').pathname);
       let target = path.join(docs,relative);
       if (relative.endsWith('/')) target = path.join(target,'index.html');
       assert.ok((await stat(target)).isFile(), `${path.basename(file)} links to missing ${relative}`);
@@ -91,7 +91,7 @@ test('published articles build safely with a project base path and contents navi
     assert.ok(article.includes('&lt;script&gt;alert(1)&lt;/script&gt;'));
     assert.ok(article.includes('href="#section-evidence"'));
     assert.ok(article.includes('id="section-evidence"'));
-    assert.ok(article.includes('href="/arun0x.run/assets/styles.css"'));
+    assert.match(article, /href="\/arun0x\.run\/assets\/styles\.css\?v=[a-f0-9]{12}"/);
     const home = await readFile(path.join(sandbox,'docs/index.html'),'utf8');
     assert.ok(home.includes('href="/arun0x.run/archive/security-check/"'));
     assert.ok(!article.includes('/first-investigation/'));

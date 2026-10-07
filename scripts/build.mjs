@@ -1,6 +1,7 @@
 import { readdir, readFile, writeFile, mkdir, rm, cp, lstat } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import { escapeHtml as e, safeBase, renderBlocks, validateEntry, headingId } from './render.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -8,6 +9,9 @@ const out = path.join(root, 'docs');
 const base = safeBase(process.env.SITE_BASE_PATH || '');
 const href = route => `${base}${route}`;
 const origin = 'https://arun0x.run';
+const assetVersion = async file => createHash('sha256').update(await readFile(path.join(root, file))).digest('hex').slice(0, 12);
+const styleVersion = await assetVersion('src/styles.css');
+const scriptVersion = await assetVersion('src/site.js');
 const arrow = '<svg class="arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13 13 3M4 3h9v9" stroke="currentColor" stroke-width="1.1"/></svg>';
 const leader = '<svg viewBox="0 0 115 70" aria-hidden="true"><path class="leader" d="M3 65 72 8h40"/><circle class="node" cx="3" cy="65" r="2.5"/></svg>';
 const paths = ['/','/archive/','/notes/','/about/','/methods/'];
@@ -67,9 +71,9 @@ ${noindex ? '<meta name="robots" content="noindex">' : `<link rel="canonical" hr
 <meta property="og:description" content="${e(description)}">
 <meta property="og:url" content="${origin}${route}">
 <link rel="icon" href="${href('/assets/favicon.svg')}" type="image/svg+xml">
-<link rel="stylesheet" href="${href('/assets/styles.css')}">
+<link rel="stylesheet" href="${href('/assets/styles.css')}?v=${styleVersion}">
 ${home ? `<link rel="preload" as="image" href="${href('/assets/archive.webp')}" imagesrcset="${href('/assets/archive-small.webp')} 960w, ${href('/assets/archive.webp')} 1536w" imagesizes="(max-width: 900px) 960px, 100vw">` : ''}
-<script src="${href('/assets/site.js')}" defer></script>
+<script src="${href('/assets/site.js')}?v=${scriptVersion}" defer></script>
 </head>
 <body>${content}</body>
 </html>\n`;
