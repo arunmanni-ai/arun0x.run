@@ -1,8 +1,8 @@
 # Connect arun0x.run from Spaceship
 
-The site is already deployed at https://arunmanni-ai.github.io/arun0x.run/.
+The site is deployed through GitHub Pages with `arun0x.run` configured as its custom domain.
 
-The DNS check during setup found `launch1.spaceship.net` and `launch2.spaceship.net` nameservers, with the domain still pointing to a parking service. These records have **not** been changed by this project.
+Setup completed in Spaceship: four GitHub Pages A records at `@`, plus `www` pointing to `arunmanni-ai.github.io`. Public DNS resolution confirms all five records. The domain serves the archive and `www` redirects to the apex. No products were purchased. The instructions below are kept for reference and recovery. Account-level domain verification remains a recommended additional step.
 
 ## 1. Verify ownership in GitHub
 
