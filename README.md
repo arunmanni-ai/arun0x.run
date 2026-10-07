@@ -13,7 +13,7 @@ npm run preview
 
 Open http://127.0.0.1:4173. `PORT=4174 npm run preview` selects a different port. The preview server listens only on your own computer. Stop with Ctrl+C.
 
-`npm test` checks content escaping, unsafe links, invalid paths, draft exclusion, and generated links/assets.
+`npm test` checks content escaping across all block types, unsafe links, invalid paths, draft exclusion, generated links/assets, heading ID isolation, reading preferences with blocked storage, and unintended asset publication.
 
 ## Publish a writeup or note
 
@@ -38,7 +38,7 @@ Supported blocks:
 ]
 ```
 
-Use `\n` inside a JSON string to represent a line break in a code block. Images go in `src/assets/`; the builder copies them to the website. Content is rendered at build time and works without JavaScript. No raw HTML content blocks are accepted. Headings create an article contents list, and code blocks have a copy button when the browser supports it.
+Use `\n` inside a JSON string to represent a line break in a code block. Images go in `src/assets/`; the builder accepts WebP, PNG, JPG, and JPEG files with simple names (letters, digits, underscores, and hyphens). It rejects hidden files, symbolic links, and other file types; the reviewed `favicon.svg` is the sole SVG exception. Content is rendered at build time and works without JavaScript. No raw HTML content blocks are accepted. Headings create an article contents list with `section-` prefixed anchors (for example, `#section-overview`), and code blocks have a copy button when the browser supports it.
 
 ## GitHub Pages and arun0x.run
 
@@ -72,7 +72,7 @@ Official guidance: [custom domains](https://docs.github.com/en/pages/configuring
 - Empty states are intentional: no invented discoveries or published posts.
 - All text and annotations are HTML/SVG overlays; the background contains no baked-in UI.
 - Responsive composition adapts the image and callouts to narrow screens.
-- Optional reading view stores only a local preference. Blocked storage does not break it.
+- Optional reading view uses a centered column and a footer that follows the content. It stores only a local preference. Blocked storage does not break it.
 - Keyboard navigation, visible focus, a skip link, reduced-motion support, and print styling.
 - System fonts and locally hosted WebP assets. No external runtime requests, trackers, cookies, analytics, or forms.
 - Canonical URLs and sitemap point to `https://arun0x.run`.

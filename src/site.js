@@ -1,4 +1,4 @@
-const toggle = document.querySelector('#reading-view');
+const toggle = document.querySelector('.reading-toggle input[type="checkbox"]');
 if (toggle) {
   const art = document.querySelector('#visual-view');
   const reading = document.querySelector('#text-view');

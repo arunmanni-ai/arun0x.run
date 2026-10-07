@@ -2,7 +2,7 @@
 
 The site is deployed through GitHub Pages with `arun0x.run` configured as its custom domain.
 
-Setup completed in Spaceship: four GitHub Pages A records at `@`, plus `www` pointing to `arunmanni-ai.github.io`. Public DNS resolution confirms all five records. The domain serves the archive and `www` redirects to the apex. No products were purchased. The instructions below are kept for reference and recovery. Account-level domain verification remains a recommended additional step.
+Setup completed in Spaceship: four GitHub Pages A records at `@`, plus `www` pointing to `arunmanni-ai.github.io`. Public DNS resolution confirms all five records. GitHub has approved the HTTPS certificate and HTTPS enforcement is enabled. The domain serves the archive over HTTPS and `www` redirects to the apex. No products were purchased. The instructions below are kept for reference and recovery. Account-level domain verification remains a recommended additional step.
 
 ## 1. Verify ownership in GitHub
 

@@ -3,6 +3,7 @@ export function safeSlug(value) {
   if (typeof value !== 'string' || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value) || value.length > 100) throw new Error('Use a lowercase, hyphen-separated slug, up to 100 characters.');
   return value;
 }
+export const headingId = value => `section-${safeSlug(value)}`;
 export function safeBase(value = '') {
   if (!/^(?:\/[a-zA-Z0-9][a-zA-Z0-9._-]*)*\/?$/.test(value) && value !== '') throw new Error('Invalid SITE_BASE_PATH.');
   return value.replace(/\/$/, '');
@@ -30,7 +31,7 @@ export function renderBlocks(blocks, base = '') {
         const id = safeSlug(block.id);
         if (usedIds.has(id)) throw new Error(`Duplicate heading: ${id}`);
         usedIds.add(id);
-        return `<h2 id="${id}">${escapeHtml(block.text)}</h2>`;
+        return `<h2 id="${headingId(id)}">${escapeHtml(block.text)}</h2>`;
       }
       case 'code': return `<div class="code-block"><div class="code-label"><span>${escapeHtml(block.language || 'text')}</span><button type="button" data-copy-code hidden aria-label="Copy code">Copy</button></div><pre><code>${escapeHtml(block.text)}</code></pre></div>`;
       case 'list': {

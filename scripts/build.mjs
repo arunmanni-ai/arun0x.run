@@ -1,7 +1,7 @@
-import { readdir, readFile, writeFile, mkdir, rm, cp, stat } from 'node:fs/promises';
+import { readdir, readFile, writeFile, mkdir, rm, cp, lstat } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { escapeHtml as e, safeBase, renderBlocks, validateEntry } from './render.mjs';
+import { escapeHtml as e, safeBase, renderBlocks, validateEntry, headingId } from './render.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const out = path.join(root, 'docs');
@@ -11,6 +11,24 @@ const origin = 'https://arun0x.run';
 const arrow = '<svg class="arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13 13 3M4 3h9v9" stroke="currentColor" stroke-width="1.1"/></svg>';
 const leader = '<svg viewBox="0 0 115 70" aria-hidden="true"><path class="leader" d="M3 65 72 8h40"/><circle class="node" cx="3" cy="65" r="2.5"/></svg>';
 const paths = ['/','/archive/','/notes/','/about/','/methods/'];
+
+async function copyAssets(source, destination, relative = '') {
+  for (const name of await readdir(source)) {
+    const asset = relative + name;
+    const from = path.join(source, name);
+    const to = path.join(destination, name);
+    const info = await lstat(from);
+    if (!/^[a-zA-Z0-9_-]+(?:\.[a-zA-Z0-9]+)?$/.test(name) || info.isSymbolicLink()) throw new Error(`Unsafe asset: ${asset}`);
+    if (info.isDirectory()) {
+      await mkdir(to, {recursive:true});
+      await copyAssets(from, to, asset + '/');
+    } else {
+      // The favicon is reviewed source code. Content assets must be raster images.
+      if (!info.isFile() || (!/\.(?:webp|png|jpg|jpeg)$/.test(name) && asset !== 'favicon.svg')) throw new Error(`Unsupported asset: ${asset}`);
+      await cp(from, to);
+    }
+  }
+}
 
 async function entries(kind) {
   const dir = path.join(root, 'content', kind);
@@ -68,7 +86,7 @@ async function page(route, current, title, description, inner, noindex = false) 
 }
 await rm(out, {recursive:true, force:true});
 await mkdir(path.join(out,'assets'), {recursive:true});
-await cp(path.join(root,'src/assets'), path.join(out,'assets'), {recursive:true});
+await copyAssets(path.join(root,'src/assets'), path.join(out,'assets'));
 await cp(path.join(root,'src/styles.css'),path.join(out,'assets/styles.css'));
 await cp(path.join(root,'src/site.js'),path.join(out,'assets/site.js'));
 const newest = posts[0];
@@ -116,7 +134,7 @@ for (const [kind, records] of [['archive',posts],['notes',notes]]) {
     const headings = entry.blocks.filter(block => block.type === 'heading');
     const wordCount = entry.blocks.map(block => block.text || block.items?.join(' ') || '').join(' ').trim().split(/\s+/).length;
     const minutes = Math.max(1, Math.ceil(wordCount / 200));
-    await page(route,kind,entry.title,entry.description,`<a class="back-link" href="${href(`/${kind}/`)}">← Back to ${kind === 'archive' ? 'archive' : 'notes'}</a><div class="page-heading"><p class="eyebrow"><time datetime="${e(entry.date)}">${e(entry.date)}</time> / ${minutes} min read${entry.tags?.length ? ' / '+entry.tags.map(e).join(' · ') : ''}</p><h1>${e(entry.title)}</h1><p class="lede">${e(entry.description)}</p></div><div class="article-layout"><article class="prose" aria-label="${e(entry.title)}">${renderBlocks(entry.blocks,base)}</article>${headings.length ? `<nav class="article-nav" aria-label="On this page"><p>On this page</p>${headings.map(block=>`<a href="#${e(block.id)}">${e(block.text)}</a>`).join('')}</nav>` : ''}</div>`);
+    await page(route,kind,entry.title,entry.description,`<a class="back-link" href="${href(`/${kind}/`)}">← Back to ${kind === 'archive' ? 'archive' : 'notes'}</a><div class="page-heading"><p class="eyebrow"><time datetime="${e(entry.date)}">${e(entry.date)}</time> / ${minutes} min read${entry.tags?.length ? ' / '+entry.tags.map(e).join(' · ') : ''}</p><h1>${e(entry.title)}</h1><p class="lede">${e(entry.description)}</p></div><div class="article-layout"><article class="prose" aria-label="${e(entry.title)}">${renderBlocks(entry.blocks,base)}</article>${headings.length ? `<nav class="article-nav" aria-label="On this page"><p>On this page</p>${headings.map(block=>`<a href="#${headingId(block.id)}">${e(block.text)}</a>`).join('')}</nav>` : ''}</div>`);
   }
 }
 await page('/404.html','','Page not found','This path does not lead to a published page.',`${heading('404','An unresolved path.','This page may have moved, or it has not been published yet.')}<a class="text-link" href="${href('/')}">Return to the archive ${arrow}</a>`,true);
