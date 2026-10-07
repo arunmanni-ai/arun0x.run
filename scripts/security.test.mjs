@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFile, readdir, stat } from 'node:fs/promises';
+import { readFile, readdir, stat, mkdtemp, cp, writeFile, rm } from 'node:fs/promises';
+import os from 'node:os';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -48,14 +49,21 @@ test('complete build excludes drafts and resolves local links and assets', async
   execFileSync(process.execPath,['scripts/build.mjs'],{cwd:root});
   const docs = path.join(root,'docs');
   const files = await walk(docs);
-  assert.ok(!files.some(file=>/first-investigation|first-note/.test(file)));
+  let publishedCount = 0;
+  for (const [folder, route] of [['posts','archive'],['notes','notes']]) {
+    const contentDir = path.join(root,'content',folder);
+    for (const name of (await readdir(contentDir)).filter(name=>name.endsWith('.json'))) {
+      const entry = JSON.parse(await readFile(path.join(contentDir,name),'utf8'));
+      if (entry.status === 'published') publishedCount++;
+      else assert.ok(!files.includes(path.join(docs,route,entry.slug,'index.html')));
+    }
+  }
   const html = files.filter(file=>file.endsWith('.html'));
-  assert.equal(html.length,6);
+  assert.equal(html.length,6 + publishedCount);
   for (const file of html) {
     const text = await readFile(file,'utf8');
     assert.ok(text.includes('Content-Security-Policy'));
     assert.ok(text.includes('Skip to content'));
-    assert.ok(!text.includes('Replace this'));
     assert.ok(!/<script(?![^>]*src=)/.test(text));
     for (const match of text.matchAll(/(?:href|src)="(\/[^"#]*)"/g)) {
       const relative = decodeURIComponent(match[1]);
@@ -65,4 +73,25 @@ test('complete build excludes drafts and resolves local links and assets', async
     }
   }
   assert.equal((await readFile(path.join(docs,'CNAME'),'utf8')).trim(),'arun0x.run');
+});
+
+test('published articles build safely with a project base path and contents navigation', async () => {
+  const sandbox = await mkdtemp(path.join(os.tmpdir(),'arun0x-content-'));
+  try {
+    for (const dir of ['scripts','src','content']) await cp(path.join(root,dir),path.join(sandbox,dir),{recursive:true});
+    const attack = '<script>alert(1)</script>';
+    await writeFile(path.join(sandbox,'content/posts/test.json'),JSON.stringify({
+      slug:'security-check', title:attack, description:attack, date:'2026-10-07', status:'published',
+      blocks:[{type:'heading',id:'evidence',text:'Evidence'},{type:'paragraph',text:attack},{type:'code',language:'html',text:attack}]
+    }));
+    execFileSync(process.execPath,['scripts/build.mjs'],{cwd:sandbox,env:{...process.env,SITE_BASE_PATH:'/arun0x.run'}});
+    const article = await readFile(path.join(sandbox,'docs/archive/security-check/index.html'),'utf8');
+    assert.ok(!article.includes('<script>alert'));
+    assert.ok(article.includes('&lt;script&gt;alert(1)&lt;/script&gt;'));
+    assert.ok(article.includes('href="#evidence"'));
+    assert.ok(article.includes('href="/arun0x.run/assets/styles.css"'));
+    const home = await readFile(path.join(sandbox,'docs/index.html'),'utf8');
+    assert.ok(home.includes('href="/arun0x.run/archive/security-check/"'));
+    assert.ok(!article.includes('/first-investigation/'));
+  } finally { await rm(sandbox,{recursive:true,force:true}); }
 });

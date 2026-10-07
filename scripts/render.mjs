@@ -4,7 +4,7 @@ export function safeSlug(value) {
   return value;
 }
 export function safeBase(value = '') {
-  if (!/^\/(?:[a-zA-Z0-9_-]+\/?)*$/.test(value) && value !== '') throw new Error('Invalid SITE_BASE_PATH.');
+  if (!/^(?:\/[a-zA-Z0-9][a-zA-Z0-9._-]*)*\/?$/.test(value) && value !== '') throw new Error('Invalid SITE_BASE_PATH.');
   return value.replace(/\/$/, '');
 }
 export function safeHref(value, base = '') {
