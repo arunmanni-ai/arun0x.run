@@ -12,6 +12,7 @@ const origin = 'https://arun0x.run';
 const assetVersion = async file => createHash('sha256').update(await readFile(path.join(root, file))).digest('hex').slice(0, 12);
 const styleVersion = await assetVersion('src/styles.css');
 const scriptVersion = await assetVersion('src/site.js');
+const stageVersion = await assetVersion('src/stage.js');
 const paths = ['/','/archive/','/notes/','/about/','/methods/'];
 
 async function copyAssets(source, destination, relative = '') {
@@ -59,14 +60,14 @@ function pagehead(title, lede, stamp = '', back = '') {
   return `<section class="rail pagehead"><div class="mark" aria-hidden="true"></div><div class="col">${back}${stamp ? `<p class="stamp">${stamp}</p>` : ''}<h1>${e(title)}</h1><p class="lede">${e(lede)}</p></div></section>`;
 }
 
-function document({title, description, route, content, noindex = false}) {
+function document({title, description, route, content, noindex = false, home = false}) {
   return `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark">
-<meta name="theme-color" content="#0b0e0f">
+<meta name="theme-color" content="#080b10">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="no-referrer">
 <title>${e(title)} · arun0x.run</title>
@@ -79,6 +80,7 @@ ${noindex ? '<meta name="robots" content="noindex">' : `<link rel="canonical" hr
 <link rel="icon" href="${href('/assets/favicon.svg')}" type="image/svg+xml">
 <link rel="stylesheet" href="${href('/assets/styles.css')}?v=${styleVersion}">
 <script src="${href('/assets/site.js')}?v=${scriptVersion}" defer></script>
+${home ? `<script src="${href('/assets/stage.js')}?v=${stageVersion}" defer></script>` : ''}
 </head>
 <body>${content}</body>
 </html>\n`;
@@ -102,6 +104,7 @@ await mkdir(path.join(out,'assets'), {recursive:true});
 await copyAssets(path.join(root,'src/assets'), path.join(out,'assets'));
 await cp(path.join(root,'src/styles.css'),path.join(out,'assets/styles.css'));
 await cp(path.join(root,'src/site.js'),path.join(out,'assets/site.js'));
+await cp(path.join(root,'src/stage.js'),path.join(out,'assets/stage.js'));
 
 /* ---- home ------------------------------------------------------------ */
 
@@ -121,10 +124,19 @@ const latest = newest ? `<a class="entry" href="${href(`/archive/${newest.slug}/
 
 const home = `<div class="shell">${masthead('')}
 <main id="main">
-<section class="rail opening"><div class="mark" aria-hidden="true"></div><div class="col">
+<section class="exhibit">
+<div class="exhibit-head">
 <h1>What a system claims, and what it actually does.</h1>
 <p class="standfirst">The unresolved archive. Independent security research by Arun, on kernel internals, client software, and the questions that stay open.</p>
-</div></section>
+</div>
+<div class="readout" data-readout hidden>
+<p class="readout-lead">Your browser was not asked for any of this. It answered anyway.</p>
+<dl data-readout-list></dl>
+<p class="readout-id" data-readout-id></p>
+<p class="readout-note">None of it left this device. This page's security policy forbids it from sending anything out.</p>
+</div>
+<div class="stage" data-stage aria-hidden="true" hidden><canvas></canvas></div>
+</section>
 ${latest}<nav class="buffer" aria-label="Sections">
 ${bufferRow('archive','archive','long-form investigations', posts.length)}
 ${bufferRow('notes','notes','smaller findings and loose ends', notes.length)}
@@ -138,7 +150,7 @@ ${bufferRow('about','about','who is behind this')}
 </main>
 ${footer()}
 </div>`;
-await save('/', document({title:'The unresolved archive', description:'Independent security research by Arun. Kernel internals, client software, and the questions still open.', route:'/', content:home}));
+await save('/', document({title:'The unresolved archive', description:'Independent security research by Arun. Kernel internals, client software, and the questions still open.', route:'/', content:home, home:true}));
 
 /* ---- listings --------------------------------------------------------- */
 

@@ -4,14 +4,14 @@
 
 :root {
   color-scheme: dark;
-  --ink: #0b0e0f;
-  --ink-raise: #121719;
+  --ink: #080b10;
+  --ink-raise: #0f141b;
   --paper: #e8e6e1;
-  --dim: #9ba09e;
-  --faint: #6a706f;
-  --rule: #232a2b;
-  --rule-lit: #3c4445;
-  --open: #c98a3f;
+  --dim: #98a1a8;
+  --faint: #66707a;
+  --rule: #1c232c;
+  --rule-lit: #333d49;
+  --open: #e0a04a;
   --closed: #74a07b;
   --mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
   --serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, 'Times New Roman', serif;
@@ -34,7 +34,7 @@ body {
 a { color: inherit; text-decoration: none; }
 button, input { font: inherit; color: inherit; }
 [hidden] { display: none !important; }
-::selection { background: #2b3a33; color: var(--paper); }
+::selection { background: #1f3350; color: var(--paper); }
 :focus-visible { outline: 2px solid var(--open); outline-offset: 4px; }
 
 .skip-link {
@@ -76,27 +76,57 @@ main { flex: 1; display: flex; flex-direction: column; }
 }
 .rail > .col { border-left: 1px solid var(--rule); padding: 0 0 0 var(--pad); min-width: 0; }
 
-/* ---- opening -------------------------------------------------------- */
+/* ---- exhibit: the headline, the readout, and the stack it describes -- */
 
-.opening > .col { padding-top: 3.25rem; padding-bottom: 3.75rem; }
-.opening h1 {
+.exhibit {
+  display: grid;
+  grid-template-columns: minmax(0, 33rem) minmax(0, 1fr);
+  grid-template-areas: "head stage" "readout stage";
+  grid-template-rows: auto 1fr;
+  column-gap: 1.5rem;
+  padding: 3rem 0 3.5rem;
+}
+.exhibit:has(> .stage[hidden]) { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "readout"; }
+.exhibit-head { grid-area: head; }
+.exhibit h1 {
   font-family: var(--serif);
-  font-size: clamp(2rem, 4.6vw, 3.4rem);
+  font-size: clamp(2rem, 3.9vw, 2.9rem);
   font-weight: 400;
   letter-spacing: -0.02em;
-  line-height: 1.22;
+  line-height: 1.2;
   margin: 0;
-  max-width: 25ch;
+  max-width: 22ch;
   text-wrap: balance;
 }
-.opening .standfirst {
+.exhibit .standfirst {
   font-family: var(--serif);
   font-size: 1.0625rem;
   line-height: 1.7;
   color: var(--dim);
-  max-width: 52ch;
-  margin: 1.6rem 0 0;
+  max-width: 44ch;
+  margin: 1.5rem 0 0;
 }
+
+.stage { grid-area: stage; position: relative; min-height: 40rem; touch-action: pan-y; cursor: grab; }
+.stage.is-held { cursor: grabbing; }
+.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+.readout { grid-area: readout; margin-top: 2.75rem; }
+.readout-lead { font-family: var(--serif); font-size: 1.0625rem; line-height: 1.6; margin: 0 0 1.1rem; max-width: 40ch; }
+.readout dl { margin: 0; border-bottom: 1px solid var(--rule); }
+.readout-row {
+  display: grid; grid-template-columns: 9.25rem minmax(0, 1fr); gap: 0 1rem;
+  padding: 0.42rem 0; border-top: 1px solid var(--rule);
+  font-size: 0.8125rem; line-height: 1.5; opacity: 0; cursor: default;
+}
+.readout-row.is-in { opacity: 1; }
+.readout-row dt { color: var(--faint); }
+.readout-row dd { margin: 0; color: var(--paper); overflow-wrap: anywhere; }
+.readout-key { display: inline-block; width: 2.1rem; color: var(--rule-lit); }
+.readout-row.is-active dt, .readout-row.is-active .readout-key, .readout-row.is-active dd { color: var(--open); }
+.readout-row:focus-visible { outline-offset: 2px; }
+.readout-id { font-size: 0.8125rem; line-height: 1.7; color: var(--dim); margin: 1.1rem 0 0; max-width: 46ch; }
+.readout-note { font-family: var(--serif); font-size: 0.9375rem; line-height: 1.65; color: var(--faint); margin: 0.6rem 0 0; max-width: 44ch; }
 
 /* ---- buffer: the section index -------------------------------------- */
 
@@ -240,13 +270,18 @@ code { font-family: var(--mono); }
 
 /* ---- narrow ------------------------------------------------------------ */
 
+@media (max-width: 60rem) {
+  .exhibit { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "stage" "readout"; grid-template-rows: auto; padding: 2.25rem 0 2.75rem; }
+  .stage { min-height: 27rem; margin-top: 1rem; }
+  .readout { margin-top: 1rem; }
+  .exhibit h1 { max-width: 20ch; }
+}
+
 @media (max-width: 46rem) {
   :root { --gutter: 4.25rem; --pad: 1.25rem; }
   .shell { width: calc(100% - 2.5rem); }
   .masthead { padding: 1.25rem 0 1rem; flex-wrap: wrap; gap: 0.75rem 1.25rem; }
   .masthead nav { gap: 1.25rem; }
-  .opening > .col { padding-top: 2.75rem; padding-bottom: 3rem; }
-  .opening h1 { max-width: 18ch; }
   .article { grid-template-columns: minmax(0, 1fr); gap: 2.5rem; }
   .contents { position: static; border-top: 1px solid var(--rule); padding-top: 1.25rem; }
   .prose { font-size: 1rem; }
@@ -264,12 +299,13 @@ code { font-family: var(--mono); }
 
 @media (prefers-reduced-motion: no-preference) {
   .masthead nav a, .brand, .line .name, .entry h2, .plain, .prose a { transition: color 120ms linear; }
+  .readout-row { transition: opacity 260ms ease-out; }
 }
 
 @media print {
   :root { --ink: #fff; --paper: #111; --dim: #333; --faint: #555; --rule: #ccc; --rule-lit: #999; --open: #111; }
   html, body { background: #fff; color: #111; }
-  .skip-link, .masthead nav, .contents, .backlink, .code-label button { display: none !important; }
+  .skip-link, .masthead nav, .contents, .backlink, .code-label button, .stage, .readout { display: none !important; }
   .shell { width: 100%; }
   .rail > .col, .line > .col, .entry > .col, .step > .col, .nothing > .col { border-left: 0; padding-left: 0; }
   .prose a { text-decoration: underline; }

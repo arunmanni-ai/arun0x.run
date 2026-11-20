@@ -4,6 +4,8 @@ Arun's independent security research archive.
 
 The layout is built on one structural idea: a gutter down the left of every page carries state, and the content column carries the work. The gutter holds entry counts on the homepage, dates on listings and articles, and step numbers on Methods. A section with nothing in it is marked the way an editor marks the end of a buffer.
 
+The homepage opens on an exhibit: a 3D stack of plates drawn on a canvas, beside a readout of what the visitor's browser disclosed without being asked (browser, system, screen, cores, GPU, time zone, languages, battery, canvas rendering and so on). Each answer cuts one plate, so every visitor sees a different object, and hovering a row lights its plate. All of it is read locally by `src/stage.js`; nothing is stored or sent, there is no IP or location lookup, and the page's content policy (`connect-src 'none'`) would block a request anyway. Without JavaScript the exhibit is simply absent.
+
 Typography splits along the same line. A serif carries anything written for a person to read — headlines, ledes, prose. A monospace carries anything the machine supplies: identifiers, counts, dates, tags, code. Titles are sentence case, identifiers are lowercase.
 
 ## Local preview
@@ -84,7 +86,7 @@ The text on About and Methods is proposed editorial copy based on the direction 
 
 ## Security boundaries
 
-This is static content, with no database, authentication, secret keys, or server-side execution. All author-controlled content is escaped; unknown block types, unsafe links, nonlocal images, invalid dates, and unsafe slugs fail the build. JavaScript does one thing: copy a code block to the clipboard. It performs no HTML injection, no storage access, and no network requests, and a test asserts those sinks stay absent.
+This is static content, with no database, authentication, secret keys, or server-side execution. All author-controlled content is escaped; unknown block types, unsafe links, nonlocal images, invalid dates, and unsafe slugs fail the build. JavaScript does two things: `site.js` copies a code block to the clipboard, and `stage.js` draws the homepage exhibit from values the browser exposes. Neither injects HTML, touches storage, or makes network requests, and a test asserts those sinks stay absent from both files.
 
 A restrictive CSP is delivered in every HTML page through a meta element. GitHub Pages does not let this project set arbitrary response headers: meta CSP cannot enforce `frame-ancestors`, and this project does not claim to set HSTS, Permissions-Policy, or other hosting-level controls. HTTPS enforcement is a GitHub Pages setting. No website can be guaranteed immune to every attack; the implementation deliberately limits the parts that can accept or execute data.
 

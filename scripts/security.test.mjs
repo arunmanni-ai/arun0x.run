@@ -122,13 +122,15 @@ test('article headings cannot collide with interface IDs', () => {
   }
 });
 
-test('the client script injects no markup and makes no network calls', async () => {
-  const source = await readFile(path.join(root, 'src/site.js'), 'utf8');
-  for (const sink of ['innerHTML', 'outerHTML', 'insertAdjacentHTML', 'document.write', 'eval(', 'Function(', 'fetch(', 'XMLHttpRequest', 'import(']) {
-    assert.ok(!source.includes(sink), `src/site.js must not use ${sink}`);
+test('client scripts inject no markup, store nothing, and make no network calls', async () => {
+  for (const file of ['src/site.js', 'src/stage.js']) {
+    const source = await readFile(path.join(root, file), 'utf8');
+    for (const sink of ['innerHTML', 'outerHTML', 'insertAdjacentHTML', 'document.write', 'eval(', 'Function(', 'fetch(', 'XMLHttpRequest', 'sendBeacon', 'WebSocket', 'EventSource', 'import(', 'localStorage', 'sessionStorage', 'indexedDB', 'document.cookie', '.src =', '.href =']) {
+      assert.ok(!source.includes(sink), `${file} must not use ${sink}`);
+    }
+    // Each must survive a page that has none of the elements it looks for.
+    vm.runInNewContext(source, { document: { querySelectorAll: () => [] } });
   }
-  // It must survive a page that has none of the elements it looks for.
-  vm.runInNewContext(source, { document: { querySelectorAll: () => [] } });
 });
 
 test('the build refuses accidental files, active assets, and symbolic links', async () => {
