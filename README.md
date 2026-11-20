@@ -1,6 +1,10 @@
 # arun0x.run
 
-Arun's independent security research archive. The homepage follows the supplied dark metallic labyrinth reference: oversized editorial type, a blue-lit architectural scene, linked research annotations, and a quieter reading view.
+Arun's independent security research archive.
+
+The layout is built on one structural idea: a gutter down the left of every page carries state, and the content column carries the work. The gutter holds entry counts on the homepage, dates on listings and articles, and step numbers on Methods. A section with nothing in it is marked the way an editor marks the end of a buffer.
+
+Typography splits along the same line. A serif carries anything written for a person to read — headlines, ledes, prose. A monospace carries anything the machine supplies: identifiers, counts, dates, tags, code. Titles are sentence case, identifiers are lowercase.
 
 ## Local preview
 
@@ -13,7 +17,7 @@ npm run preview
 
 Open http://127.0.0.1:4173. `PORT=4174 npm run preview` selects a different port. The preview server listens only on your own computer. Stop with Ctrl+C.
 
-`npm test` checks content escaping across all block types, unsafe links, invalid paths, draft exclusion, generated links/assets, heading ID isolation, reading preferences with blocked storage, and unintended asset publication.
+`npm test` checks content escaping across all block types, unsafe links, invalid paths, draft exclusion, generated links/assets, heading ID isolation, client-script injection sinks, and unintended asset publication.
 
 ## Publish a writeup or note
 
@@ -69,24 +73,23 @@ Official guidance: [custom domains](https://docs.github.com/en/pages/configuring
 ## Design and behavior
 
 - Home, archive, notes, about, methods, and a custom 404 page.
-- Empty states are intentional: no invented discoveries or published posts.
-- All text and annotations are HTML/SVG overlays; the background contains no baked-in UI.
-- Responsive composition adapts the image and callouts to narrow screens.
-- Optional reading view uses a centered column and a footer that follows the content. It stores only a local preference. Blocked storage does not break it.
-- Keyboard navigation, visible focus, a skip link, reduced-motion support, and print styling.
-- System fonts and locally hosted WebP assets. No external runtime requests, trackers, cookies, analytics, or forms.
+- Empty states state the publishing rule rather than apologise for being empty. No invented discoveries or placeholder posts.
+- The homepage leads with the newest published investigation as soon as one exists; until then the section index carries the page.
+- Entry counts in the gutter are generated from published content, so the homepage cannot claim work that is not there.
+- Keyboard navigation, visible focus, a skip link, reduced-motion support, and print styling that drops the rail and prints on white.
+- System fonts only. No external runtime requests, webfonts, trackers, cookies, analytics, or forms.
 - Canonical URLs and sitemap point to `https://arun0x.run`.
 
 The text on About and Methods is proposed editorial copy based on the direction of the reference. Review it before your first writeup to make sure it reflects your own approach.
 
 ## Security boundaries
 
-This is static content, with no database, authentication, secret keys, or server-side execution. All author-controlled content is escaped; unknown block types, unsafe links, nonlocal images, invalid dates, and unsafe slugs fail the build. JavaScript performs only the reading-view preference and copying code, with no HTML injection or network requests.
+This is static content, with no database, authentication, secret keys, or server-side execution. All author-controlled content is escaped; unknown block types, unsafe links, nonlocal images, invalid dates, and unsafe slugs fail the build. JavaScript does one thing: copy a code block to the clipboard. It performs no HTML injection, no storage access, and no network requests, and a test asserts those sinks stay absent.
 
 A restrictive CSP is delivered in every HTML page through a meta element. GitHub Pages does not let this project set arbitrary response headers: meta CSP cannot enforce `frame-ancestors`, and this project does not claim to set HSTS, Permissions-Policy, or other hosting-level controls. HTTPS enforcement is a GitHub Pages setting. No website can be guaranteed immune to every attack; the implementation deliberately limits the parts that can accept or execute data.
 
 ## Artwork
 
-The site background is an AI-assisted edit of the supplied reference image using the built-in image generation tool. The requested edit removed all interface typography, rules, checkbox, and callouts while preserving the metallic labyrinth geometry, framing, materials, central void, and electric-blue light. The resulting 1536 × 1024 scene was converted to local WebP files for delivery; the 960px version supports smaller screens.
+The site no longer uses a background image. `src/assets/archive.webp` and `archive-small.webp` are kept in the repository so the earlier homepage can be restored, and their provenance is recorded in `ARTWORK.md`. They are still copied into `docs/assets/`; delete both files if you want them out of the deploy.
 
-No image generation occurs on the website. Asset-generation details and the full prompt are in `ARTWORK.md`.
+No image generation occurs on the website.

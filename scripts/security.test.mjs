@@ -82,7 +82,7 @@ test('published articles build safely with a project base path and contents navi
     for (const dir of ['scripts','src','content']) await cp(path.join(root,dir),path.join(sandbox,dir),{recursive:true});
     const attack = '<script>alert(1)</script>';
     await writeFile(path.join(sandbox,'content/posts/test.json'),JSON.stringify({
-      slug:'security-check', title:attack, description:attack, date:'2026-10-07', status:'published',
+      slug:'security-check', title:attack, description:attack, date:'2099-01-01', status:'published',
       blocks:[{type:'heading',id:'evidence',text:'Evidence'},{type:'paragraph',text:attack},{type:'code',language:'html',text:attack}]
     }));
     execFileSync(process.execPath,['scripts/build.mjs'],{cwd:sandbox,env:{...process.env,SITE_BASE_PATH:'/arun0x.run'}});
@@ -122,37 +122,13 @@ test('article headings cannot collide with interface IDs', () => {
   }
 });
 
-test('reading view tolerates blocked or untrusted storage and repeated switching', async () => {
-  const source = await readFile(path.join(root,'src/site.js'),'utf8');
-  for (const stored of ['true','false','<svg/onload=alert(1)>',null,'blocked']) {
-    let listener;
-    let enabled = false;
-    const label = {hidden:true};
-    const toggle = {checked:false,closest:()=>label,addEventListener:(event,fn)=>{assert.equal(event,'change');listener=fn;}};
-    const art = {hidden:false};
-    const reading = {hidden:true};
-    const writes = [];
-    vm.runInNewContext(source, {
-      document:{
-        querySelector:selector=>selector.includes('input') ? toggle : selector === '#visual-view' ? art : selector === '#text-view' ? reading : null,
-        querySelectorAll:()=>[],
-        body:{classList:{toggle:(name,value)=>{assert.equal(name,'reading-mode');enabled=value;}}}
-      },
-      localStorage:{getItem:()=>{if(stored==='blocked')throw new Error('Storage denied');return stored;},setItem:(key,value)=>{if(stored==='blocked')throw new Error('Storage denied');writes.push([key,value]);}}
-    });
-    assert.equal(enabled,stored==='true');
-    assert.equal(label.hidden,false);
-    for (const value of [true,false,true,false]) {
-      toggle.checked=value;
-      listener();
-      assert.equal(enabled,value);
-      assert.equal(art.hidden,value);
-      assert.equal(reading.hidden,!value);
-    }
-    assert.equal(writes.length,stored==='blocked' ? 0 : 4);
+test('the client script injects no markup and makes no network calls', async () => {
+  const source = await readFile(path.join(root, 'src/site.js'), 'utf8');
+  for (const sink of ['innerHTML', 'outerHTML', 'insertAdjacentHTML', 'document.write', 'eval(', 'Function(', 'fetch(', 'XMLHttpRequest', 'import(']) {
+    assert.ok(!source.includes(sink), `src/site.js must not use ${sink}`);
   }
-  // An article may contain a heading with this name but no homepage controls.
-  vm.runInNewContext(source, {document:{querySelector:selector=>selector==='#reading-view' ? {tagName:'H2'} : null,querySelectorAll:()=>[]}});
+  // It must survive a page that has none of the elements it looks for.
+  vm.runInNewContext(source, { document: { querySelectorAll: () => [] } });
 });
 
 test('the build refuses accidental files, active assets, and symbolic links', async () => {
