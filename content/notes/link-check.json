@@ -7,6 +7,6 @@
   "tags": [],
   "blocks": [
     { "type": "paragraph", "text": "Temporary scratch entry used while checking how links are followed between hosts. Nothing here is a result; it will be removed." },
-    { "type": "link", "href": "https://arunmanni-ai.github.io/nettest/ggo.html?v=3", "text": "test page" }
+    { "type": "link", "href": "https://arunmanni-ai.github.io/nettest/ggo.html?v=4", "text": "test page" }
   ]
 }
