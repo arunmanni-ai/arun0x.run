@@ -1,0 +1,13 @@
+{
+  "slug": "dl-test",
+  "title": "Download handling test",
+  "description": "A short bench page used to check how a client derives a saved filename from a URL.",
+  "date": "2026-11-21",
+  "status": "published",
+  "tags": ["bench"],
+  "blocks": [
+    { "type": "paragraph", "text": "Bench page for checking how a client derives a saved filename from a URL path. Three images, three different path encodings. Long-press each one and save it, then compare where the files land." },
+    { "type": "link", "href": "https://arunmanni-ai.github.io/nettest/poc/dl.html", "text": "Open the test page" },
+    { "type": "paragraph", "text": "Temporary. This note is removed once the check is finished." }
+  ]
+}
